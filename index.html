@@ -1,10 +1,81 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Erinnerungen</title>
+    <title>Erinnerungen bearbeiten</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        input, button { margin: 5px; padding: 8px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    </style>
 </head>
 <body>
-    <h1>Meine Erinnerungen</h1>
-    <p>Dies ist eine einfache Seite für Erinnerungen.</p>
+    <h2>Erinnerungen bearbeiten</h2>
+    <input id="time" type="time" placeholder="Uhrzeit">
+    <input id="message" type="text" placeholder="Erinnerung">
+    <button onclick="addReminder()">Hinzufügen</button>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Uhrzeit</th>
+                <th>Nachricht</th>
+            </tr>
+        </thead>
+        <tbody id="reminderTable"></tbody>
+    </table>
+
+    <script>
+        const repo = "JulusDevWeb/espclock";
+        const token = "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";  // Hier deinen Token einfügen
+        const apiUrl = `https://api.github.com/repos/${repo}/contents/data.json`;
+
+        async function getReminders() {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            const content = atob(data.content);
+            const reminders = JSON.parse(content).reminders;
+
+            const table = document.getElementById("reminderTable");
+            table.innerHTML = "";
+            reminders.forEach((item) => {
+                const row = `<tr><td>${item.time}</td><td>${item.message}</td></tr>`;
+                table.innerHTML += row;
+            });
+        }
+
+        async function addReminder() {
+            const time = document.getElementById("time").value;
+            const message = document.getElementById("message").value;
+
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            const content = atob(data.content);
+            const reminders = JSON.parse(content).reminders;
+
+            reminders.push({ time, message });
+
+            const updatedContent = btoa(JSON.stringify({ reminders }, null, 2));
+            const payload = {
+                message: "Erinnerung hinzugefügt",
+                content: updatedContent,
+                sha: data.sha
+            };
+
+            await fetch(apiUrl, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `token ${token}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            });
+
+            alert("Erinnerung hinzugefügt!");
+            getReminders();
+        }
+
+        getReminders();
+    </script>
 </body>
 </html>
