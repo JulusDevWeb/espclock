@@ -1,1 +1,16 @@
-
+{
+  "reminders": [
+    {
+      "time": "08:00",
+      "message": "Aufstehen und Kaffee trinken"
+    },
+    {
+      "time": "12:30",
+      "message": "Mittagessen"
+    },
+    {
+      "time": "18:00",
+      "message": "Sport machen"
+    }
+  ]
+}
